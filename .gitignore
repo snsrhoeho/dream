@@ -9,6 +9,8 @@ __pycache__/
 streamlit.out.log
 streamlit.err.log
 tmp/
+.playwright-cli/
+favicon.ico
 
 data/pdfs/
 data/*.pdf

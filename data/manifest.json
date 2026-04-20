@@ -1,0 +1,42 @@
+{
+  "version": "20260418162305",
+  "generated_at": "2026-04-18T16:23:05.018355+00:00",
+  "assets": [
+    {
+      "path": "data/courses.json",
+      "type": "json",
+      "sha256": "545cd200475325c3ca1372fb706cde5eb30fb45d3ec4883ec506733828f66261",
+      "bytes": 1079143
+    },
+    {
+      "path": "data/prerequisites.json",
+      "type": "json",
+      "sha256": "a0a8ba4acaa80e77f5db2093526b6d07ac9c72c9419702d6c29e5cb30d6f26fa",
+      "bytes": 45918
+    },
+    {
+      "path": "data/syllabus_chunks.json",
+      "type": "json",
+      "sha256": "0b8337bd503476d466f4ee934cdc45e951c1e2e1574be386fdf9a766e55d5fde",
+      "bytes": 213345
+    },
+    {
+      "path": "data/embeddings.bin",
+      "type": "bin",
+      "sha256": "82a2a03051fdf19a380b1f9e5db012015ec9703b007bcab956bbfdb9191d45a9",
+      "bytes": 708608
+    },
+    {
+      "path": "data/rules.json",
+      "type": "json",
+      "sha256": "8ae429b20182406aa79a8589334abc1905bee13cd3a95ec4b1892f514d943f2e",
+      "bytes": 31889
+    },
+    {
+      "path": "data/test_scenarios.json",
+      "type": "json",
+      "sha256": "7c21a7e29e2638dd671c556d5077a11b9e6ecabd7e3249ed580923d30b885e43",
+      "bytes": 8855
+    }
+  ]
+}

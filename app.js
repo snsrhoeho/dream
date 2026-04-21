@@ -416,6 +416,8 @@ const COURSE_SCORE_WEIGHTS = {
   curriculum: 0.4,
   graduation: 0.22,
 };
+const FRESHMAN_AUDIENCE_MAX_GRADE = 2;
+const DEFERRED_GRADE_MIN = 3;
 
 const state = {
   bundle: null,
@@ -569,12 +571,14 @@ function bindEvents() {
     }
   });
 
-  elements.refreshButton.addEventListener("click", async () => {
-    setMessage("자료를 다시 불러오는 중입니다.");
-    await clearCache();
-    state.initialized = false;
-    await init(true);
-  });
+  if (elements.refreshButton) {
+    elements.refreshButton.addEventListener("click", async () => {
+      setMessage("자료를 다시 불러오는 중입니다.");
+      await clearCache();
+      state.initialized = false;
+      await init(true);
+    });
+  }
 
   elements.majorResults.addEventListener("click", (event) => {
     const button = event.target.closest("[data-major-pick]");
@@ -1522,6 +1526,7 @@ function recommendCourses(params) {
     const orderPenalty = sequencePenalty(course, progression);
     const continuityBonus = progression.directUnlockIds.has(course.id) ? 0.18 : 0;
     const structuralBonus = Math.min(0.16, Number(course.dependent_count || 0) * 0.08);
+    const audienceHold = shouldHoldForFreshmanAudience(course, targetGrade);
     const total =
       semantic * COURSE_SCORE_WEIGHTS.semantic +
       curriculum * COURSE_SCORE_WEIGHTS.curriculum +
@@ -1547,15 +1552,19 @@ function recommendCourses(params) {
         structural_bonus: round4(structuralBonus),
       },
       progression_label: progressionLabel,
+      audience_hold: audienceHold,
+      audience_hold_reason: audienceHold
+        ? `1학년 대상 안내 기준으로 ${course.grade || course.grade_value}학년 과목은 우선 보류합니다.`
+        : "",
     };
     const reasonSlots = buildReasonSlots(item, params, missingNames, keywordHits);
     item.reason_slots = reasonSlots;
     item.reason = Object.values(reasonSlots).join(" ");
 
-    if (!missingNames.length && total <= 0) {
+    if (!missingNames.length && !audienceHold && total <= 0) {
       continue;
     }
-    if (missingNames.length) {
+    if (missingNames.length || audienceHold) {
       blocked.push(item);
     } else {
       ready.push(item);
@@ -1563,7 +1572,13 @@ function recommendCourses(params) {
   }
 
   ready.sort((a, b) => b.score - a.score || b.score_breakdown.semantic - a.score_breakdown.semantic);
-  blocked.sort((a, b) => b.score - a.score || a.missing_prerequisites.length - b.missing_prerequisites.length);
+  blocked.sort(
+    (a, b) =>
+      Number(b.audience_hold) - Number(a.audience_hold) ||
+      Number(b.grade_value || 0) - Number(a.grade_value || 0) ||
+      b.score - a.score ||
+      a.missing_prerequisites.length - b.missing_prerequisites.length
+  );
 
   return {
     ready: ready.slice(0, Number(state.bundle.rules.limits?.ready || 8)),
@@ -1693,7 +1708,9 @@ function buildReasonSlots(course, params, missingNames, keywordHits) {
     : `관심사 매칭: ${normalizeSpace(positiveText) ? "설문 프로필과 과목 프로필 유사도가 높습니다." : "전공/트랙 기준 추천입니다."}`;
 
   let prerequisiteStatus;
-  if (missingNames.length) {
+  if (course.audience_hold && !missingNames.length) {
+    prerequisiteStatus = `보류 기준: ${course.audience_hold_reason}`;
+  } else if (missingNames.length) {
     prerequisiteStatus = `선수 충족 여부: ${missingNames.slice(0, 3).join(", ")} 미이수로 보류 대상입니다.`;
   } else if ((course.prerequisite_names || []).length) {
     prerequisiteStatus = `선수 충족 여부: ${course.prerequisite_names.slice(0, 3).join(", ")} 기준으로 충족 상태입니다.`;
@@ -1814,6 +1831,14 @@ function estimateTargetGrade(matchedIds) {
     return 1;
   }
   return Math.min(4, Math.max(...grades) + 1);
+}
+
+function shouldHoldForFreshmanAudience(course, targetGrade) {
+  const gradeValue = Number(course.grade_value || 0);
+  if (!gradeValue) {
+    return false;
+  }
+  return targetGrade <= FRESHMAN_AUDIENCE_MAX_GRADE && gradeValue >= DEFERRED_GRADE_MIN;
 }
 
 function buildProgressionContext(courses, matchedIds) {
@@ -2181,10 +2206,11 @@ function clamp(value, min, max) {
 
 function buildPdfHref(path, page) {
   const encodedPath = encodeURI(String(path || ""));
-  if (!page) {
-    return encodedPath;
+  const fragments = ["zoom=72"];
+  if (page) {
+    fragments.unshift(`page=${page}`);
   }
-  return `${encodedPath}#page=${page}`;
+  return `${encodedPath}#${fragments.join("&")}`;
 }
 
 function setMessage(message, isError = false) {

@@ -81,6 +81,60 @@ body::before {
   z-index: 1;
 }
 
+.notice-banner {
+  margin-bottom: 18px;
+  padding: 18px 22px;
+  background:
+    radial-gradient(circle at top right, rgba(173, 229, 255, 0.24), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(239, 248, 255, 0.92));
+}
+
+.notice-inner {
+  display: grid;
+  grid-template-columns: minmax(112px, 156px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+
+.notice-mascot {
+  width: 100%;
+}
+
+.notice-mascot-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.notice-content {
+  min-width: 0;
+}
+
+.notice-kicker {
+  margin: 0;
+  color: var(--accent);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.notice-copy {
+  margin: 8px 0 0;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.notice-copy a {
+  color: var(--accent-ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.notice-copy a:hover {
+  text-decoration: underline;
+}
+
 .panel {
   background: var(--panel);
   backdrop-filter: blur(18px);
@@ -1204,4 +1258,14 @@ textarea {
   .pdf-frame {
     height: 460px;
   }
+
+  .notice-inner {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .notice-mascot {
+    width: min(136px, 100%);
+  }
+
 }

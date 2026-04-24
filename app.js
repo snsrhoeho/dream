@@ -369,39 +369,71 @@ const SURVEY_QUESTIONS = SURVEY_SECTIONS.flatMap((section) =>
   section.questions.map((question) => ({ ...question, sectionId: section.id, sectionTitle: section.title }))
 );
 const SURVEY_QUESTION_MAP = new Map(SURVEY_QUESTIONS.map((question) => [question.id, question]));
+const QUESTIONNAIRE_CONFIG_PATH = "./data/questionnaire_v2.json";
+const CONVERGENCE_UNIT_NAME = "융합학부";
 
-const SAMPLE_SURVEY_ANSWERS = {
-  q01: 5,
-  q02: 5,
-  q03: 4,
-  q04: 4,
-  q05: 4,
-  q06: 3,
-  q07: 2,
-  q08: 4,
-  q09: 5,
-  q10: 4,
-  q11: 3,
-  q12: 3,
-  q13: 2,
-  q14: 4,
-  q15: 3,
-  q16: 2,
-  q17: 3,
-  q18: 3,
-  q19: 2,
-  q20: 1,
-  q21: 3,
-  q22: 2,
-  q23: 4,
-  q24: 2,
-  q25: 2,
-  q26: 1,
-  q27: 4,
-  q28: 4,
-  q29: 3,
-  q30: 3,
-};
+const SAMPLE_SURVEY_PROFILES = [
+  {
+    id: "cs_core",
+    label: "컴퓨터공학 중심 예시",
+    focusMajors: ["컴퓨터공학과", "정보통신공학과"],
+    supportMajors: ["미디어소프트웨어학과", "산업경영공학과"],
+  },
+  {
+    id: "media_ux",
+    label: "미디어 서비스형 예시",
+    focusMajors: ["미디어소프트웨어학과", "융합학부"],
+    supportMajors: ["컴퓨터공학과", "문화선교학과"],
+  },
+  {
+    id: "smart_city",
+    label: "도시·스마트시티형 예시",
+    focusMajors: ["도시디자인정보공학과", "정보통신공학과"],
+    supportMajors: ["산업경영공학과", "행정학부"],
+  },
+  {
+    id: "business_strategy",
+    label: "경영 전략형 예시",
+    focusMajors: ["경영학과", "글로벌물류학과"],
+    supportMajors: ["산업경영공학과", "관광학과"],
+  },
+  {
+    id: "logistics_data",
+    label: "물류·최적화형 예시",
+    focusMajors: ["글로벌물류학과", "산업경영공학과"],
+    supportMajors: ["경영학과", "국제개발협력학과"],
+  },
+  {
+    id: "public_global",
+    label: "국제·공공형 예시",
+    focusMajors: ["국제개발협력학과", "행정학부"],
+    supportMajors: ["사회복지학과", "영어영문학과"],
+  },
+  {
+    id: "care_support",
+    label: "상담·복지형 예시",
+    focusMajors: ["사회복지학과", "기독교교육상담학과"],
+    supportMajors: ["행정학부", "문화선교학과"],
+  },
+  {
+    id: "tourism_service",
+    label: "관광·서비스형 예시",
+    focusMajors: ["관광학과", "글로벌물류학과"],
+    supportMajors: ["경영학과", "영어영문학과"],
+  },
+  {
+    id: "theology_mission",
+    label: "신학·선교형 예시",
+    focusMajors: ["신학과", "문화선교학과"],
+    supportMajors: ["기독교교육상담학과", "국제개발협력학과"],
+  },
+  {
+    id: "language_humanities",
+    label: "언어·인문형 예시",
+    focusMajors: ["국어국문학과", "영어영문학과"],
+    supportMajors: ["중어중문학과", "융합학부"],
+  },
+];
 
 const EMPTY_RESULT = {
   ready: [],
@@ -411,6 +443,7 @@ const EMPTY_RESULT = {
 };
 
 const GUIDEBOOK_PDF_PATH = "./data/2026 전공설계지원센터가이드북 최종.pdf";
+const RECOMMENDATION_SCORE_EPSILON = 0.0001;
 const COURSE_SCORE_WEIGHTS = {
   semantic: 0.38,
   curriculum: 0.4,
@@ -418,19 +451,153 @@ const COURSE_SCORE_WEIGHTS = {
 };
 const FRESHMAN_AUDIENCE_MAX_GRADE = 2;
 const DEFERRED_GRADE_MIN = 3;
+const SYNTHETIC_MAJOR_CONFIG = {
+  "신학과": {
+    sourceMajors: ["문화선교학과"],
+    supplementalMajors: ["파이데이아학부"],
+    includePatterns: ["기독교", "신앙", "성서", "선교", "예배", "종교", "교회"],
+    excludePatterns: ["채플"],
+  },
+  "융합학부 미디어콘텐츠테크놀로지전공": {
+    supplementalMajors: ["파이데이아학부", "문화선교학과"],
+    includePatterns: [
+      "미디어",
+      "콘텐츠",
+      "메타버스",
+      "XR",
+      "버츄얼",
+      "1인미디어",
+      "영상",
+      "영화제작",
+      "언론",
+      "뉴미디어",
+      "광고",
+      "드론",
+      "모션",
+      "언리얼",
+      "생성형AI",
+    ],
+    excludePatterns: ["채플"],
+  },
+  "융합학부 바이오화장품공학전공": {
+    supplementalMajors: ["뷰티디자인학과"],
+    includePatterns: ["화장품", "피부", "뷰티", "미용", "색채", "코스메"],
+    excludePatterns: [],
+  },
+  "융합학부 K-콘텐츠전공": {
+    supplementalMajors: ["파이데이아학부", "문화선교학과"],
+    includePatterns: [
+      "콘텐츠",
+      "스토리",
+      "엔터테인먼트",
+      "광고",
+      "브랜드",
+      "창업",
+      "한류",
+      "글로벌리즘",
+      "영화제작",
+      "스피치",
+      "공연기획",
+      "미디어",
+    ],
+    excludePatterns: ["채플"],
+  },
+};
+const COLLEGE_THEME_MAP = {
+  theology: {
+    name: "신학대학",
+    optionText: "#8d4a12",
+    optionBg: "#fff3d9",
+    selectBg: "linear-gradient(180deg, rgba(255, 247, 226, 0.98), rgba(255, 239, 208, 0.94))",
+    selectBorder: "rgba(215, 162, 67, 0.42)",
+  },
+  humanities: {
+    name: "인문대학",
+    optionText: "#7d2f67",
+    optionBg: "#fde9f6",
+    selectBg: "linear-gradient(180deg, rgba(254, 239, 249, 0.98), rgba(251, 226, 243, 0.94))",
+    selectBorder: "rgba(203, 116, 178, 0.36)",
+  },
+  social: {
+    name: "사회과학대학",
+    optionText: "#0f6a66",
+    optionBg: "#e2fbf8",
+    selectBg: "linear-gradient(180deg, rgba(235, 253, 250, 0.98), rgba(214, 247, 242, 0.94))",
+    selectBorder: "rgba(69, 181, 169, 0.38)",
+  },
+  business: {
+    name: "글로벌경영기술대학",
+    optionText: "#7a4c0f",
+    optionBg: "#fdf0df",
+    selectBg: "linear-gradient(180deg, rgba(255, 245, 231, 0.98), rgba(251, 233, 207, 0.94))",
+    selectBorder: "rgba(215, 149, 67, 0.38)",
+  },
+  engineering: {
+    name: "IT공과대학",
+    optionText: "#1950a9",
+    optionBg: "#e6f1ff",
+    selectBg: "linear-gradient(180deg, rgba(237, 245, 255, 0.99), rgba(220, 235, 255, 0.95))",
+    selectBorder: "rgba(78, 139, 235, 0.4)",
+  },
+  convergence: {
+    name: "미래인재융합대학",
+    optionText: "#2d5e4a",
+    optionBg: "#e8fbf0",
+    selectBg: "linear-gradient(180deg, rgba(239, 255, 245, 0.99), rgba(220, 248, 233, 0.95))",
+    selectBorder: "rgba(88, 173, 124, 0.36)",
+  },
+  other: {
+    name: "기타",
+    optionText: "#35516b",
+    optionBg: "#eef5fb",
+    selectBg: "linear-gradient(180deg, rgba(248, 252, 255, 0.98), rgba(238, 246, 252, 0.94))",
+    selectBorder: "rgba(104, 139, 179, 0.3)",
+  },
+};
+const MAJOR_COLLEGE_MAP = {
+  "신학과": "theology",
+  "기독교교육상담학과": "theology",
+  "문화선교학과": "theology",
+  "국어국문학과": "humanities",
+  "영어영문학과": "humanities",
+  "중어중문학과": "humanities",
+  "관광학과": "social",
+  "국제개발협력학과": "social",
+  "사회복지학과": "social",
+  "행정학부": "social",
+  "경영학과": "business",
+  "글로벌물류학과": "business",
+  "글로벌물류학부": "business",
+  "산업경영공학과": "business",
+  "컴퓨터공학과": "engineering",
+  "정보통신공학과": "engineering",
+  "정보통신학과": "engineering",
+  "미디어소프트웨어학과": "engineering",
+  "도시디자인정보공학과": "engineering",
+  "융합학부": "convergence",
+};
 
 const state = {
   bundle: null,
+  questionnaire: null,
   validationReport: null,
   majorsMeta: [],
   db: null,
   coursesById: new Map(),
   coursesByMajor: new Map(),
   majorProfiles: [],
+  recommendationProfiles: [],
+  recommendationProfileMap: new Map(),
+  recommendationUnits: [],
+  recommendationUnitMap: new Map(),
+  availableMajors: [],
+  displayMajors: [],
   scenarios: [],
   surveyAnswers: new Map(),
   activeRecommendations: [],
   majorLocked: false,
+  sampleProfileLabel: "",
+  lastSampleProfileId: "",
   initialized: false,
   eventsBound: false,
 };
@@ -441,7 +608,10 @@ const elements = {
   surveyProgressText: document.getElementById("surveyProgressText"),
   surveyProgressBar: document.getElementById("surveyProgressBar"),
   submitButton: document.getElementById("submitButton"),
+  courseSubmitButton: document.getElementById("courseSubmitButton"),
   majorSelect: document.getElementById("majorSelect"),
+  submajorField: document.getElementById("submajorField"),
+  submajorSelect: document.getElementById("submajorSelect"),
   trackSelect: document.getElementById("trackSelect"),
   semesterSelect: document.getElementById("semesterSelect"),
   completedInput: document.getElementById("completedInput"),
@@ -463,17 +633,116 @@ const elements = {
   validationStatus: document.getElementById("validationStatus"),
 };
 
+function getScaleOptions() {
+  if (Array.isArray(state.questionnaire?.scale_options) && state.questionnaire.scale_options.length) {
+    return state.questionnaire.scale_options.map((option) => ({
+      score: Number(option.score),
+      label: option.label,
+      normalized:
+        typeof option.normalized === "number"
+          ? Number(option.normalized)
+          : clamp((Number(option.score || 1) - 1) / Math.max(1, state.questionnaire.scale_options.length - 1), 0, 1),
+    }));
+  }
+  return SCALE_OPTIONS.map((option, index) => ({
+    ...option,
+    normalized: clamp(index / Math.max(1, SCALE_OPTIONS.length - 1), 0, 1),
+  }));
+}
+
+function getSurveySections() {
+  return Array.isArray(state.questionnaire?.sections) && state.questionnaire.sections.length
+    ? state.questionnaire.sections
+    : SURVEY_SECTIONS;
+}
+
+function getSurveyQuestions() {
+  return getSurveySections().flatMap((section) =>
+    (section.questions || []).map((question) => ({
+      ...question,
+      text: question.prompt || question.text || "",
+      sectionId: section.id,
+      sectionTitle: section.title,
+    }))
+  );
+}
+
+function getSurveyTotal() {
+  return getSurveyQuestions().length;
+}
+
+function getQuestionById(questionId) {
+  return getSurveyQuestions().find((question) => question.id === questionId) || SURVEY_QUESTION_MAP.get(questionId) || null;
+}
+
+function isConvergenceMajor(value) {
+  return normalizeSpace(value) === CONVERGENCE_UNIT_NAME;
+}
+
+function getRecommendationUnit(majorName) {
+  return state.recommendationUnitMap.get(normalizeSpace(majorName)) || null;
+}
+
+function getDisplayMajors() {
+  return state.displayMajors.length ? state.displayMajors : state.availableMajors;
+}
+
+function getAvailableSubmajors(majorName = elements.majorSelect?.value) {
+  const unit = getRecommendationUnit(majorName);
+  if (!unit || unit.selection_mode !== "submajor") {
+    return [];
+  }
+  return (unit.source_majors || []).filter(Boolean);
+}
+
+function getEffectiveMajorName(displayMajor = elements.majorSelect?.value, submajorName = elements.submajorSelect?.value) {
+  const major = normalizeSpace(displayMajor);
+  if (!major) {
+    return "";
+  }
+  if (!isConvergenceMajor(major)) {
+    return major;
+  }
+  return normalizeSpace(submajorName);
+}
+
+function getEffectiveMajorLabel(displayMajor, effectiveMajor) {
+  if (isConvergenceMajor(displayMajor) && effectiveMajor) {
+    return `${displayMajor} > ${stripConvergencePrefix(effectiveMajor)}`;
+  }
+  return displayMajor;
+}
+
+function stripConvergencePrefix(value) {
+  return normalizeSpace(value).replace(/^융합학부\s*/, "");
+}
+
+function buildQuestionnaireIndexes() {
+  const units = Array.isArray(state.questionnaire?.recommendation_units)
+    ? state.questionnaire.recommendation_units.map((item) => ({
+        ...item,
+        name: normalizeSpace(item.name),
+        source_majors: (item.source_majors || []).map((value) => normalizeSpace(value)).filter(Boolean),
+      }))
+    : [];
+  state.recommendationUnits = units;
+  state.recommendationUnitMap = new Map(units.map((unit) => [unit.name, unit]));
+  state.displayMajors = units.map((unit) => unit.name);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   void init();
 });
 
 async function init(forceRefresh = false) {
   setMessage("잠시만 기다려주세요.");
-  renderQuestionnaire();
-  syncSurveyProgress();
 
   try {
     bindEvents();
+    state.questionnaire = await loadOptionalJson(QUESTIONNAIRE_CONFIG_PATH);
+    buildQuestionnaireIndexes();
+    renderQuestionnaire();
+    syncSurveyProgress();
     state.bundle = await loadBundle(forceRefresh);
     state.validationReport = await loadOptionalJson("./tmp/validation_report.json");
     state.majorsMeta = (await loadOptionalJson("./data/majors.json")) || [];
@@ -518,6 +787,7 @@ function bindEvents() {
 
     state.surveyAnswers.set(questionId, score);
     state.majorLocked = false;
+    state.sampleProfileLabel = "";
     syncSurveyProgress();
 
     if (state.initialized && isSurveyComplete()) {
@@ -529,6 +799,8 @@ function bindEvents() {
 
   elements.majorSelect.addEventListener("change", () => {
     state.majorLocked = true;
+    applyMajorSelectTheme();
+    updateSubmajorOptions();
     updateTrackOptions();
     if (state.initialized && isSurveyComplete()) {
       renderCurrentMajorDetail();
@@ -537,6 +809,19 @@ function bindEvents() {
       runRecommendation();
     }
   });
+
+  if (elements.submajorSelect) {
+    elements.submajorSelect.addEventListener("change", () => {
+      state.majorLocked = true;
+      updateTrackOptions();
+      if (state.initialized && isSurveyComplete()) {
+        renderCurrentMajorDetail();
+      }
+      if (state.initialized && isSurveyComplete()) {
+        runRecommendation();
+      }
+    });
+  }
 
   elements.trackSelect.addEventListener("change", () => {
     state.majorLocked = true;
@@ -594,18 +879,34 @@ function bindEvents() {
 
     elements.majorSelect.value = major;
     state.majorLocked = true;
+    applyMajorSelectTheme();
+    updateSubmajorOptions();
     updateTrackOptions(track);
     renderCurrentMajorDetail();
     if (state.initialized && isSurveyComplete()) {
       runRecommendation();
     }
   });
+
+  elements.pdfLinkStack.addEventListener("click", (event) => {
+    const previewButton = event.target.closest("[data-pdf-preview]");
+    if (!previewButton) {
+      return;
+    }
+    event.preventDefault();
+    const href = previewButton.getAttribute("data-pdf-preview") || "";
+    if (!href) {
+      return;
+    }
+    elements.majorPdfFrame.src = href;
+  });
 }
 
 function renderQuestionnaire() {
   let questionNumber = 0;
+  const sections = getSurveySections();
 
-  elements.questionnaireSections.innerHTML = SURVEY_SECTIONS.map((section) => {
+  elements.questionnaireSections.innerHTML = sections.map((section) => {
     const cards = section.questions
       .map((question) => {
         questionNumber += 1;
@@ -631,7 +932,7 @@ function renderQuestionnaire() {
 }
 
 function renderQuestionCard(question, ordinal) {
-  const buttons = SCALE_OPTIONS.map(
+  const buttons = getScaleOptions().map(
     (option) => `
       <button
         type="button"
@@ -652,7 +953,7 @@ function renderQuestionCard(question, ordinal) {
         <span class="question-number">Q${String(ordinal).padStart(2, "0")}</span>
         <span class="question-status" data-question-status="${escapeAttr(question.id)}">미응답</span>
       </div>
-      <p class="question-text">${escapeHtml(question.text)}</p>
+      <p class="question-text">${escapeHtml(question.prompt || question.text || "")}</p>
       <div class="scale-grid">${buttons}</div>
     </article>
   `;
@@ -660,17 +961,25 @@ function renderQuestionCard(question, ordinal) {
 
 function syncSurveyProgress() {
   const answeredCount = state.surveyAnswers.size;
-  const percent = answeredCount ? Math.round((answeredCount / SURVEY_TOTAL) * 100) : 0;
+  const totalQuestions = getSurveyTotal();
+  const percent = answeredCount ? Math.round((answeredCount / Math.max(1, totalQuestions)) * 100) : 0;
 
-  elements.surveyProgressText.textContent = `${answeredCount} / ${SURVEY_TOTAL}`;
+  elements.surveyProgressText.textContent = `${answeredCount} / ${totalQuestions}`;
   elements.surveyProgressBar.style.width = `${percent}%`;
-  elements.submitButton.disabled = answeredCount < SURVEY_TOTAL;
+  elements.submitButton.disabled = answeredCount < totalQuestions;
   elements.submitButton.textContent =
-    answeredCount < SURVEY_TOTAL
-      ? `추천 보려면 ${SURVEY_TOTAL - answeredCount}개 더 답하기`
+    answeredCount < totalQuestions
+      ? `추천 보려면 ${totalQuestions - answeredCount}개 더 답하기`
       : "추천 보기";
+  if (elements.courseSubmitButton) {
+    elements.courseSubmitButton.disabled = answeredCount < totalQuestions;
+    elements.courseSubmitButton.textContent =
+      answeredCount < totalQuestions
+        ? `추천 보려면 ${totalQuestions - answeredCount}개 더 답하기`
+        : "이 전공으로 과목 추천 보기";
+  }
 
-  for (const section of SURVEY_SECTIONS) {
+  for (const section of getSurveySections()) {
     const completed = section.questions.filter((question) => state.surveyAnswers.has(question.id)).length;
     const pill = elements.questionnaireSections.querySelector(`[data-section-progress="${section.id}"]`);
     if (pill) {
@@ -678,11 +987,12 @@ function syncSurveyProgress() {
     }
   }
 
-  for (const question of SURVEY_QUESTIONS) {
+  const scaleOptions = getScaleOptions();
+  for (const question of getSurveyQuestions()) {
     const answer = Number(state.surveyAnswers.get(question.id) || 0);
     const card = elements.questionnaireSections.querySelector(`[data-question-card="${question.id}"]`);
     const status = elements.questionnaireSections.querySelector(`[data-question-status="${question.id}"]`);
-    const label = SCALE_OPTIONS.find((option) => option.score === answer)?.label || "미응답";
+    const label = scaleOptions.find((option) => option.score === answer)?.label || "미응답";
 
     if (card) {
       card.classList.toggle("answered", Boolean(answer));
@@ -701,18 +1011,60 @@ function syncSurveyProgress() {
 }
 
 function fillSampleSurvey() {
-  state.surveyAnswers = new Map(
-    Object.entries(SAMPLE_SURVEY_ANSWERS).map(([questionId, score]) => [questionId, Number(score)])
-  );
+  const sampleProfile = pickSampleSurveyProfile();
+  if (!sampleProfile) {
+    return;
+  }
+
+  const answers = getSurveyQuestions().map((question) => [question.id, buildSampleSurveyAnswer(question, sampleProfile)]);
+  state.surveyAnswers = new Map(answers);
+  state.sampleProfileLabel = sampleProfile.label;
+  state.lastSampleProfileId = sampleProfile.id;
   elements.completedInput.value = "";
+  if (elements.submajorSelect) {
+    elements.submajorSelect.value = "";
+  }
   if (state.bundle?.rules?.default_semester) {
     elements.semesterSelect.value = state.bundle.rules.default_semester;
   }
   syncSurveyProgress();
 }
 
+function pickSampleSurveyProfile() {
+  if (!SAMPLE_SURVEY_PROFILES.length) {
+    return null;
+  }
+  const candidates =
+    SAMPLE_SURVEY_PROFILES.length > 1
+      ? SAMPLE_SURVEY_PROFILES.filter((profile) => profile.id !== state.lastSampleProfileId)
+      : SAMPLE_SURVEY_PROFILES;
+  return pickRandom(candidates.length ? candidates : SAMPLE_SURVEY_PROFILES);
+}
+
+function buildSampleSurveyAnswer(question, sampleProfile) {
+  const focusMajors = new Set((sampleProfile.focusMajors || []).map((major) => normalizeSpace(major)));
+  const supportMajors = new Set((sampleProfile.supportMajors || []).map((major) => normalizeSpace(major)));
+  const primaryMajor = normalizeSpace(question.primary_major);
+  const secondaryMajors = (question.secondary_majors || []).map((major) => normalizeSpace(major));
+  const maxScore = Math.max(1, getScaleOptions().length);
+
+  if (focusMajors.has(primaryMajor)) {
+    return clamp(pickRandom([5, 6, 6]), 1, maxScore);
+  }
+  if (supportMajors.has(primaryMajor)) {
+    return clamp(pickRandom([4, 5, 5]), 1, maxScore);
+  }
+  if (secondaryMajors.some((major) => focusMajors.has(major))) {
+    return clamp(pickRandom([4, 4, 5]), 1, maxScore);
+  }
+  if (secondaryMajors.some((major) => supportMajors.has(major))) {
+    return clamp(pickRandom([3, 4, 4]), 1, maxScore);
+  }
+  return clamp(pickRandom([1, 2, 2, 3]), 1, maxScore);
+}
+
 function isSurveyComplete() {
-  return state.surveyAnswers.size === SURVEY_TOTAL;
+  return state.surveyAnswers.size === getSurveyTotal();
 }
 
 function setSurveyPendingState() {
@@ -720,7 +1072,7 @@ function setSurveyPendingState() {
   if (!answeredCount) {
     setMessage("질문에 답하면 추천 결과가 나옵니다.");
   } else {
-    setMessage(`${answeredCount}/${SURVEY_TOTAL} 답변 완료`);
+    setMessage(`${answeredCount}/${getSurveyTotal()} 답변 완료`);
   }
 
   renderMajorRecommendations([]);
@@ -777,11 +1129,13 @@ async function loadBundle(forceRefresh = false) {
 }
 
 function buildIndexes() {
+  const workingCoursesPayload = buildWorkingCoursesPayload();
   state.coursesById = new Map();
   state.coursesByMajor = new Map();
   state.scenarios = Array.isArray(state.bundle.scenarios) ? state.bundle.scenarios : [];
+  state.availableMajors = buildAvailableMajors(workingCoursesPayload);
 
-  for (const course of state.bundle.coursesPayload.courses || []) {
+  for (const course of workingCoursesPayload.courses || []) {
     state.coursesById.set(course.id, course);
     if (!state.coursesByMajor.has(course.major)) {
       state.coursesByMajor.set(course.major, []);
@@ -790,7 +1144,7 @@ function buildIndexes() {
   }
 
   const metaByName = new Map((state.majorsMeta || []).map((item) => [normalizeSpace(item.name), item]));
-  state.majorProfiles = (state.bundle.coursesPayload.majors || []).map((major) => {
+  state.majorProfiles = state.availableMajors.map((major) => {
     const majorName = normalizeSpace(major);
     const majorCourses = state.coursesByMajor.get(majorName) || [];
     const meta = metaByName.get(majorName) || {};
@@ -831,13 +1185,244 @@ function buildIndexes() {
       vector: textToVector(profileText, state.bundle.rules.embedding),
     };
   });
+  buildRecommendationProfiles();
+}
+
+function buildRecommendationProfiles() {
+  const units = state.recommendationUnits.length
+    ? state.recommendationUnits
+    : state.availableMajors.map((major) => ({
+        name: major,
+        selection_mode: "major",
+        source_majors: [major],
+        keywords: [],
+        summary: "",
+      }));
+
+  state.recommendationProfiles = units.map((unit) => {
+    const sourceMajors = unit.source_majors?.length ? unit.source_majors : [unit.name];
+    const sourceTracks = sourceMajors.flatMap((major) => state.bundle.rules.track_catalog?.[major]?.tracks || []);
+    const courseNames = sourceMajors.flatMap((major) =>
+      (state.coursesByMajor.get(major) || [])
+        .slice()
+        .sort((a, b) => Number(b.core_score || 0) - Number(a.core_score || 0))
+        .slice(0, 6)
+        .map((course) => course.course_name)
+    );
+    const tokens = dedupeTextList([
+      unit.name,
+      ...(unit.keywords || []),
+      ...sourceMajors.map((major) => stripConvergencePrefix(major)),
+      ...sourceTracks.flatMap((track) => [track.name, ...(track.keywords || [])]),
+      ...courseNames,
+    ]);
+    const profileText = normalizeSpace(
+      [
+        unit.name,
+        unit.summary || "",
+        ...(unit.keywords || []),
+        ...sourceMajors.map((major) => stripConvergencePrefix(major)),
+        ...sourceTracks.flatMap((track) => [track.name, track.summary, ...(track.keywords || [])]),
+        ...courseNames,
+      ].join(" ")
+    );
+
+    return {
+      name: unit.name,
+      summary: unit.summary || "",
+      selectionMode: unit.selection_mode || "major",
+      sourceMajors,
+      tokens,
+      vector: textToVector(profileText, state.bundle.rules.embedding),
+    };
+  });
+  state.recommendationProfileMap = new Map(state.recommendationProfiles.map((profile) => [profile.name, profile]));
+}
+
+function buildWorkingCoursesPayload() {
+  const payload = state.bundle.coursesPayload || {};
+  const baseCourses = Array.isArray(payload.courses) ? payload.courses : [];
+  const majors = new Set(Array.isArray(payload.majors) ? payload.majors : []);
+  const syntheticCourses = [];
+
+  for (const [majorName, config] of Object.entries(SYNTHETIC_MAJOR_CONFIG)) {
+    const sourceCourses = collectSyntheticMajorSourceCourses(baseCourses, config);
+    if (!sourceCourses.length) {
+      continue;
+    }
+    syntheticCourses.push(...cloneCoursesForSyntheticMajor(majorName, sourceCourses));
+    majors.add(majorName);
+  }
+
+  return {
+    ...payload,
+    majors: Array.from(majors),
+    courses: [...baseCourses, ...syntheticCourses],
+  };
+}
+
+function buildAvailableMajors(coursesPayload) {
+  const ordered = [];
+  const seen = new Set();
+  const pushMajor = (value) => {
+    const major = normalizeSpace(value);
+    if (!major || seen.has(major)) {
+      return;
+    }
+    seen.add(major);
+    ordered.push(major);
+  };
+
+  for (const item of state.majorsMeta || []) {
+    pushMajor(item?.name);
+  }
+  for (const major of coursesPayload?.majors || []) {
+    pushMajor(major);
+  }
+  for (const major of Object.keys(state.bundle.rules.track_catalog || {})) {
+    pushMajor(major);
+  }
+  return ordered;
+}
+
+function collectSyntheticMajorSourceCourses(courses, config) {
+  const sourceMajors = new Set((config?.sourceMajors || []).map((item) => normalizeSpace(item)));
+  const supplementalMajors = new Set((config?.supplementalMajors || []).map((item) => normalizeSpace(item)));
+  const includePatterns = (config?.includePatterns || []).map((item) => normalizeSpace(item)).filter(Boolean);
+  const excludePatterns = (config?.excludePatterns || []).map((item) => normalizeSpace(item)).filter(Boolean);
+  const selected = [];
+  const seen = new Set();
+
+  for (const course of courses || []) {
+    const major = normalizeSpace(course?.major);
+    const courseName = normalizeSpace(course?.course_name);
+    if (!major || !courseName) {
+      continue;
+    }
+
+    let include = sourceMajors.has(major);
+    if (!include && supplementalMajors.has(major)) {
+      include = includePatterns.some((pattern) => courseName.includes(pattern));
+    }
+    if (!include) {
+      continue;
+    }
+    if (excludePatterns.some((pattern) => courseName.includes(pattern))) {
+      continue;
+    }
+    if (seen.has(course.id)) {
+      continue;
+    }
+    seen.add(course.id);
+    selected.push(course);
+  }
+
+  return selected;
+}
+
+function cloneCoursesForSyntheticMajor(targetMajor, sourceCourses) {
+  const cloned = [];
+  const idMap = new Map();
+
+  for (const sourceCourse of sourceCourses) {
+    const cloneId = `${sourceCourse.id}__${slugifyMajor(targetMajor)}`;
+    idMap.set(sourceCourse.id, cloneId);
+    const course = {
+      ...sourceCourse,
+      id: cloneId,
+      major: targetMajor,
+      sections: [...(sourceCourse.sections || [])],
+      professors: [...(sourceCourse.professors || [])],
+      class_times: [...(sourceCourse.class_times || [])],
+      classrooms: [...(sourceCourse.classrooms || [])],
+      offered_semesters: [...(sourceCourse.offered_semesters || [])],
+      source_refs: (sourceCourse.source_refs || []).map((item) => ({ ...item })),
+      prerequisite_ids: [...(sourceCourse.prerequisite_ids || [])],
+      prerequisite_names: [...(sourceCourse.prerequisite_names || [])],
+      dependent_ids: [...(sourceCourse.dependent_ids || [])],
+      dependent_names: [...(sourceCourse.dependent_names || [])],
+      chunk_indices: [...(sourceCourse.chunk_indices || [])],
+      raw_profile_text: buildRawProfileTextForMajor(sourceCourse, targetMajor),
+    };
+    const derived = inferTrackContributionsForMajor(course, targetMajor);
+    course.track_contributions = derived.trackContributions;
+    course.keywords = derived.keywords;
+    cloned.push(course);
+  }
+
+  for (const course of cloned) {
+    course.prerequisite_ids = (course.prerequisite_ids || []).map((item) => idMap.get(item) || item);
+    course.dependent_ids = (course.dependent_ids || []).map((item) => idMap.get(item) || item);
+  }
+
+  return cloned;
+}
+
+function buildRawProfileTextForMajor(course, majorName) {
+  return normalizeSpace(
+    [
+      majorName,
+      course.course_name,
+      course.course_code,
+      `${course.grade || course.grade_value || ""}학년`,
+      course.completion_type,
+      (course.offered_semesters || []).join(" "),
+    ].join(" ")
+  );
+}
+
+function inferTrackContributionsForMajor(course, majorName) {
+  const tracks = state.bundle.rules.track_catalog?.[majorName]?.tracks || [];
+  if (!tracks.length) {
+    return {
+      trackContributions: [...(course.track_contributions || [])],
+      keywords: dedupeTextList([course.course_name, course.course_code, ...(course.keywords || [])]),
+    };
+  }
+
+  const courseVector = textToVector(course.raw_profile_text, state.bundle.rules.embedding);
+  const scored = [];
+  for (const track of tracks) {
+    const trackTokens = dedupeTextList([track.name, ...(track.keywords || [])]);
+    const lexical = keywordScore(course.raw_profile_text, trackTokens);
+    const trackText = normalizeSpace([track.name, track.summary, ...(track.keywords || [])].join(" "));
+    const similarity = cosineSimilarity(courseVector, textToVector(trackText, state.bundle.rules.embedding));
+    const score = similarity + 0.15 * lexical.score;
+    if (score <= 0) {
+      continue;
+    }
+    scored.push({
+      name: track.name,
+      score: round4(score),
+      matched_keywords: lexical.hits.slice(0, 3),
+    });
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  const top = scored.length
+    ? scored.slice(0, 3)
+    : tracks.length
+      ? [{ name: tracks[0].name, score: 0.18, matched_keywords: (tracks[0].keywords || []).slice(0, 2) }]
+      : [];
+
+  return {
+    trackContributions: top,
+    keywords: dedupeTextList([
+      course.course_name,
+      course.course_code,
+      ...top.flatMap((item) => [item.name, ...(item.matched_keywords || [])]),
+    ]),
+  };
+}
+
+function slugifyMajor(value) {
+  return normalizeSpace(value).replace(/\s+/g, "-");
 }
 
 function populateControls() {
-  const majors = state.bundle.coursesPayload.majors || [];
-  elements.majorSelect.innerHTML = majors
-    .map((major) => `<option value="${escapeAttr(major)}">${escapeHtml(major)}</option>`)
-    .join("");
+  const majors = getDisplayMajors();
+  elements.majorSelect.innerHTML = renderMajorOptions(majors);
+  applyMajorSelectTheme();
 
   const semesters = state.bundle.rules.semesters || [];
   const defaultSemester = state.bundle.rules.default_semester || "all";
@@ -851,36 +1436,119 @@ function populateControls() {
     ),
   ].join("");
 
+  updateSubmajorOptions();
   updateTrackOptions();
   renderEmptyMajorDetail();
 }
 
+function renderMajorOptions(majors) {
+  const grouped = new Map();
+  for (const major of majors || []) {
+    const collegeId = getCollegeIdForMajor(major);
+    if (!grouped.has(collegeId)) {
+      grouped.set(collegeId, []);
+    }
+    grouped.get(collegeId).push(major);
+  }
+
+  const groups = Array.from(grouped.entries())
+    .map(([collegeId, majorNames]) => {
+      const theme = COLLEGE_THEME_MAP[collegeId] || COLLEGE_THEME_MAP.other;
+      const options = majorNames
+        .map((major) => {
+          return `<option value="${escapeAttr(major)}" data-college="${escapeAttr(collegeId)}" style="color:${escapeAttr(
+            theme.optionText
+          )}; background:${escapeAttr(theme.optionBg)};">${escapeHtml(major)}</option>`;
+        })
+        .join("");
+      return `<optgroup label="${escapeAttr(theme.name)}">${options}</optgroup>`;
+    })
+    .join("");
+
+  return `<option value="">추천 전공 선택</option>${groups}`;
+}
+
+function getCollegeIdForMajor(majorName) {
+  const major = normalizeSpace(majorName);
+  return MAJOR_COLLEGE_MAP[major] || "other";
+}
+
+function applyMajorSelectTheme() {
+  const collegeId = getCollegeIdForMajor(elements.majorSelect.value);
+  const theme = COLLEGE_THEME_MAP[collegeId] || COLLEGE_THEME_MAP.other;
+  elements.majorSelect.style.setProperty("--major-select-bg", theme.selectBg);
+  elements.majorSelect.style.setProperty("--major-select-border", theme.selectBorder);
+  elements.majorSelect.style.setProperty("--major-select-text", theme.optionText);
+}
+
 function updateTrackOptions(preferredTrack) {
-  const major = elements.majorSelect.value;
+  const major = getEffectiveMajorName();
   const currentTrack = preferredTrack === undefined ? elements.trackSelect.value : preferredTrack;
+  if (!major) {
+    elements.trackSelect.innerHTML = ['<option value="">세부 전공 선택 후 트랙 표시</option>'].join("");
+    elements.trackSelect.value = "";
+    elements.trackSelect.disabled = true;
+    return;
+  }
   const tracks = state.bundle.rules.track_catalog?.[major]?.tracks || [];
   const options = ['<option value="">전체 트랙</option>'];
   for (const track of tracks) {
     options.push(`<option value="${escapeAttr(track.name)}">${escapeHtml(track.name)}</option>`);
   }
   elements.trackSelect.innerHTML = options.join("");
+  elements.trackSelect.disabled = false;
 
   const validTracks = new Set(["", ...tracks.map((track) => track.name)]);
   elements.trackSelect.value = validTracks.has(currentTrack) ? currentTrack : "";
+}
+
+function updateSubmajorOptions() {
+  if (!elements.submajorField || !elements.submajorSelect) {
+    return;
+  }
+  const major = normalizeSpace(elements.majorSelect.value);
+  const submajors = getAvailableSubmajors(major);
+  if (!submajors.length) {
+    elements.submajorField.hidden = true;
+    elements.submajorSelect.innerHTML = "";
+    elements.submajorSelect.value = "";
+    return;
+  }
+
+  const preferred = normalizeSpace(elements.submajorSelect.value);
+  elements.submajorField.hidden = false;
+  elements.submajorSelect.innerHTML = [
+    '<option value="">세부 전공 선택</option>',
+    ...submajors.map(
+      (submajor) =>
+        `<option value="${escapeAttr(submajor)}">${escapeHtml(stripConvergencePrefix(submajor))}</option>`
+    ),
+  ].join("");
+  const valid = new Set(["", ...submajors]);
+  elements.submajorSelect.value = valid.has(preferred) ? preferred : "";
 }
 
 function renderCurrentMajorDetail() {
   if (!state.bundle) {
     return;
   }
-  renderMajorDetail(elements.majorSelect.value, elements.trackSelect.value, elements.semesterSelect.value);
+  renderMajorDetail(
+    elements.majorSelect.value,
+    getEffectiveMajorName(),
+    elements.trackSelect.value,
+    elements.semesterSelect.value
+  );
 }
 
 function renderEmptyMajorDetail() {
   elements.majorDetailPanel.innerHTML =
     '<div class="empty-state">질문을 다 답하면 추천 전공의 트랙과 설명이 여기에 나옵니다.</div>';
   elements.pdfLinkStack.innerHTML = renderPdfLinks([buildGuidebookDownloadLink()]);
-  elements.majorPdfFrame.removeAttribute("src");
+  clearPdfPreview();
+}
+
+function clearPdfPreview() {
+  elements.majorPdfFrame.src = "about:blank";
 }
 
 function renderMeta() {
@@ -908,8 +1576,11 @@ function runRecommendation() {
   }
 
   const surveyProfile = buildSurveyProfile();
+  const effectiveMajor = getEffectiveMajorName();
   const majorParams = {
-    major: elements.majorSelect.value,
+    display_major: elements.majorSelect.value,
+    major: effectiveMajor,
+    selected_submajor: elements.submajorSelect?.value || "",
     selected_track: elements.trackSelect.value,
     target_semester: elements.semesterSelect.value,
     activities: surveyProfile.activities,
@@ -917,28 +1588,40 @@ function runRecommendation() {
     career: surveyProfile.career,
     avoid: surveyProfile.avoid,
     extra: surveyProfile.extra,
+    tallies: surveyProfile.tallies,
     completed_courses: elements.completedInput.value,
   };
 
   const majorRecommendations = recommendMajors(majorParams);
+  const tiedTopCount = majorRecommendations.filter((item) => item.rank === 1).length;
   state.activeRecommendations = majorRecommendations;
   renderMajorRecommendations(majorRecommendations);
 
   if (majorRecommendations.length && !state.majorLocked) {
     const top = majorRecommendations[0];
-    elements.majorSelect.value = top.major;
-    updateTrackOptions(top.tracks?.[0]?.name || "");
+    elements.majorSelect.value = tiedTopCount > 1 ? "" : top.major;
+    applyMajorSelectTheme();
+    updateSubmajorOptions();
+    updateTrackOptions(tiedTopCount > 1 ? "" : top.tracks?.[0]?.name || "");
   }
 
   const params = {
     ...majorParams,
-    major: elements.majorSelect.value,
+    display_major: elements.majorSelect.value,
+    major: getEffectiveMajorName(),
+    selected_submajor: elements.submajorSelect?.value || "",
     selected_track: elements.trackSelect.value,
   };
 
-  renderMajorDetail(params.major, params.selected_track, params.target_semester);
+  renderMajorDetail(params.display_major, params.major, params.selected_track, params.target_semester);
 
   const messageParts = [];
+  if (state.sampleProfileLabel) {
+    messageParts.push(`예시 응답: ${state.sampleProfileLabel}`);
+  }
+  if (tiedTopCount > 1) {
+    messageParts.push(`공동 1위 ${tiedTopCount}개`);
+  }
   if (surveyProfile.dominantLabels.length) {
     messageParts.push(`주요 성향: ${surveyProfile.dominantLabels.join(", ")}`);
   }
@@ -946,10 +1629,26 @@ function runRecommendation() {
   setMessage(messageParts.join(" · "));
 
   const recommendation = recommendCourses(params);
-  renderRecommendation(recommendation);
+  if (!params.display_major && tiedTopCount > 1) {
+    renderRecommendation(EMPTY_RESULT, {
+      ready: "공동 1위 전공 중 하나를 선택하면 과목 추천이 나옵니다.",
+      blocked: "전공을 선택하면 보류 과목도 함께 확인할 수 있습니다.",
+    });
+  } else if (isConvergenceMajor(params.display_major) && !params.major) {
+    renderRecommendation(recommendation, {
+      ready: "융합학부는 세부 전공을 먼저 선택하면 과목 추천이 나옵니다.",
+      blocked: "세부 전공을 선택한 뒤 보류 과목을 확인할 수 있습니다.",
+    });
+  } else {
+    renderRecommendation(recommendation);
+  }
 }
 
 function buildSurveyProfile() {
+  if (state.recommendationUnits.length) {
+    return buildBalancedSurveyProfile();
+  }
+
   const buckets = {
     activities: [],
     subjects: [],
@@ -998,6 +1697,112 @@ function buildSurveyProfile() {
   };
 }
 
+function getNormalizedSurveyScore(questionId) {
+  const answer = Number(state.surveyAnswers.get(questionId) || 0);
+  if (!answer) {
+    return 0;
+  }
+  const option = getScaleOptions().find((item) => item.score === answer);
+  if (option) {
+    return Number(option.normalized || 0);
+  }
+  const options = getScaleOptions();
+  return clamp((answer - 1) / Math.max(1, options.length - 1), 0, 1);
+}
+
+function computeRecommendationTallies() {
+  const tallies = new Map(
+    state.recommendationUnits.map((unit) => [
+      unit.name,
+      {
+        primaryAccum: 0,
+        primaryMax: 0,
+        secondaryAccum: 0,
+        secondaryMax: 0,
+        primaryHits: [],
+        secondaryHits: [],
+      },
+    ])
+  );
+
+  for (const question of getSurveyQuestions()) {
+    const normalized = getNormalizedSurveyScore(question.id);
+    const questionText = question.prompt || question.text || "";
+    const weights = question.major_weights || {};
+    for (const [majorName, weightValue] of Object.entries(weights)) {
+      const major = normalizeSpace(majorName);
+      const tally = tallies.get(major);
+      const weight = Number(weightValue || 0);
+      if (!tally || !weight) {
+        continue;
+      }
+      if (normalizeSpace(question.primary_major) === major) {
+        tally.primaryAccum += normalized;
+        tally.primaryMax += 1;
+        tally.primaryHits.push({
+          text: questionText,
+          score: normalized,
+        });
+      } else {
+        tally.secondaryAccum += normalized * weight;
+        tally.secondaryMax += weight;
+        tally.secondaryHits.push({
+          text: questionText,
+          score: normalized * weight,
+        });
+      }
+    }
+  }
+
+  for (const tally of tallies.values()) {
+    tally.primaryHits.sort((a, b) => b.score - a.score);
+    tally.secondaryHits.sort((a, b) => b.score - a.score);
+    tally.primaryNormalized = tally.primaryMax ? tally.primaryAccum / tally.primaryMax : 0;
+    tally.secondaryNormalized = tally.secondaryMax ? tally.secondaryAccum / tally.secondaryMax : 0;
+  }
+  return tallies;
+}
+
+function buildBalancedSurveyProfile() {
+  const tallies = computeRecommendationTallies();
+  const positiveTokens = [];
+  const avoidTokens = [];
+  const scoredUnits = Array.from(tallies.entries())
+    .map(([name, tally]) => ({
+      name,
+      score: 0.82 * tally.primaryNormalized + 0.18 * tally.secondaryNormalized,
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  for (const question of getSurveyQuestions()) {
+    const normalized = getNormalizedSurveyScore(question.id);
+    const unit = getRecommendationUnit(question.primary_major);
+    const prompt = question.prompt || question.text || "";
+    const keywords = unit?.keywords || [];
+    if (normalized >= 0.6) {
+      positiveTokens.push(prompt, ...keywords);
+    } else if (normalized <= 0.4) {
+      avoidTokens.push(prompt, ...keywords);
+    }
+  }
+
+  const dominantLabels = scoredUnits.filter((item) => item.score > 0.5).slice(0, 3).map((item) => item.name);
+  const topKeywords = dominantLabels.flatMap((name) => getRecommendationUnit(name)?.keywords || []);
+  const summaryTokens = dominantLabels
+    .map((name) => getRecommendationUnit(name)?.summary || "")
+    .filter((value) => normalizeSpace(value));
+
+  return {
+    activities: normalizeSpace(dedupeTextList(positiveTokens).join(" ")),
+    subjects: normalizeSpace(dedupeTextList(topKeywords).join(" ")),
+    career: normalizeSpace(dominantLabels.join(" ")),
+    extra: normalizeSpace(summaryTokens.join(" ")),
+    avoid: normalizeSpace(dedupeTextList(avoidTokens).join(" ")),
+    dominantLabels,
+    tallies,
+  };
+}
+
 function applyQuestionSignals(question, delta, buckets) {
   if (!delta) {
     return;
@@ -1031,6 +1836,10 @@ function flattenSignalValues(signals) {
 }
 
 function recommendMajors(params) {
+  if (state.recommendationUnits.length) {
+    return recommendMajorsFromBalancedQuestionnaire(params);
+  }
+
   const positiveText = buildPositiveProfileText(params);
   if (!normalizeSpace(positiveText)) {
     return [];
@@ -1095,8 +1904,103 @@ function recommendMajors(params) {
     });
   }
 
-  scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, 3);
+  return finalizeMajorRecommendations(scored);
+}
+
+function recommendMajorsFromBalancedQuestionnaire(params) {
+  const tallies = params.tallies instanceof Map ? params.tallies : computeRecommendationTallies();
+  const scored = [];
+
+  for (const profile of state.recommendationProfiles) {
+    const tally =
+      tallies.get(profile.name) || {
+        primaryNormalized: 0,
+        secondaryNormalized: 0,
+        primaryHits: [],
+      };
+    const total = 0.82 * tally.primaryNormalized + 0.18 * tally.secondaryNormalized;
+    const topPrimaryReasons = tally.primaryHits
+      .filter((item) => item.score >= 0.6)
+      .slice(0, 2)
+      .map((item) => shortenQuestionText(item.text));
+    const unit = getRecommendationUnit(profile.name);
+    const reasons = [];
+    if (topPrimaryReasons.length) {
+      reasons.push(`${topPrimaryReasons.join(" / ")} 반응이 높았습니다.`);
+    }
+    if (unit?.summary) {
+      reasons.push(unit.summary);
+    }
+    if (profile.selectionMode === "submajor") {
+      reasons.push("세부 전공은 선택 전공 단계에서 고를 수 있습니다.");
+    }
+    if (!reasons.length) {
+      reasons.push("학과별 균등 문항 점수를 기준으로 추천했습니다.");
+    }
+
+    const primarySourceMajor = profile.selectionMode === "submajor" ? "" : profile.sourceMajors[0] || profile.name;
+    scored.push({
+      major: profile.name,
+      score: round4(total),
+      reason: reasons.join(" "),
+      tracks: primarySourceMajor ? recommendTracks(primarySourceMajor, params) : [],
+      selection_mode: profile.selectionMode,
+      source_majors: [...profile.sourceMajors],
+    });
+  }
+
+  return finalizeMajorRecommendations(scored);
+}
+
+function shortenQuestionText(text) {
+  const normalized = normalizeSpace(text);
+  return normalized.length > 36 ? `${normalized.slice(0, 36)}...` : normalized;
+}
+
+function finalizeMajorRecommendations(scored, limit = 3) {
+  const sorted = (scored || []).slice().sort((a, b) => b.score - a.score);
+  if (!sorted.length) {
+    return [];
+  }
+
+  const grouped = [];
+  for (const item of sorted) {
+    const lastGroup = grouped[grouped.length - 1];
+    if (lastGroup && isSameRecommendationScore(lastGroup.score, item.score)) {
+      lastGroup.items.push(item);
+      continue;
+    }
+    grouped.push({
+      score: item.score,
+      items: [item],
+    });
+  }
+
+  const annotated = [];
+  let rank = 1;
+  for (const group of grouped) {
+    const rankLabel = group.items.length > 1 ? `공동 ${rank}위` : `TOP ${rank}`;
+    for (const item of group.items) {
+      annotated.push({
+        ...item,
+        rank,
+        rank_label: rankLabel,
+        tied_count: group.items.length,
+      });
+    }
+    rank += group.items.length;
+  }
+
+  if (annotated.length <= limit) {
+    return annotated;
+  }
+
+  const cutoffScore = annotated[Math.max(0, limit - 1)]?.score ?? annotated[annotated.length - 1].score;
+  return annotated.filter((item, index) => index < limit || isSameRecommendationScore(item.score, cutoffScore));
+}
+
+function isSameRecommendationScore(left, right) {
+  return Math.abs(Number(left || 0) - Number(right || 0)) <= RECOMMENDATION_SCORE_EPSILON;
 }
 
 function recommendTracks(majorName, params) {
@@ -1133,7 +2037,7 @@ function recommendTracks(majorName, params) {
 function renderMajorRecommendations(recommendations) {
   if (!recommendations.length) {
     elements.majorResults.innerHTML =
-      '<div class="empty-state">30문항 설문을 모두 응답하면 추천 전공 Top3가 표시됩니다.</div>';
+      `<div class="empty-state">${getSurveyTotal()}문항 설문을 모두 응답하면 추천 전공 Top3가 표시됩니다.</div>`;
     return;
   }
 
@@ -1143,18 +2047,22 @@ function renderMajorRecommendations(recommendations) {
       const trackPills = (item.tracks || [])
         .map((track) => `<span class="track-pill">${escapeHtml(track.name)}</span>`)
         .join("");
+      const extraPill =
+        item.selection_mode === "submajor"
+          ? '<span class="track-pill">선택 후 세부 전공 표시</span>'
+          : "";
 
       return `
         <article class="major-card">
           <div class="major-head">
             <div>
-              <div class="major-rank">TOP ${index + 1}</div>
+              <div class="major-rank">${escapeHtml(item.rank_label || `TOP ${index + 1}`)}</div>
               <h3 class="major-title">${escapeHtml(item.major)}</h3>
             </div>
             <div class="score-chip">${item.score.toFixed(2)}</div>
           </div>
           <p class="major-reason">${escapeHtml(item.reason)}</p>
-          <div class="track-stack">${trackPills}</div>
+          <div class="track-stack">${trackPills}${extraPill}</div>
           <div class="major-action">
             <button
               type="button"
@@ -1171,15 +2079,21 @@ function renderMajorRecommendations(recommendations) {
     .join("");
 }
 
-function renderMajorDetail(majorName, selectedTrack, targetSemester) {
-  if (!majorName) {
+function renderMajorDetail(displayMajor, effectiveMajor, selectedTrack, targetSemester) {
+  if (!displayMajor) {
     elements.majorDetailPanel.innerHTML =
       '<div class="empty-state">전공이 선택되면 트랙과 PDF 정보가 여기에 표시됩니다.</div>';
     elements.pdfLinkStack.innerHTML = renderPdfLinks([buildGuidebookDownloadLink()]);
-    elements.majorPdfFrame.removeAttribute("src");
+    clearPdfPreview();
     return;
   }
 
+  if (isConvergenceMajor(displayMajor) && !effectiveMajor) {
+    renderConvergenceUnitDetail(targetSemester);
+    return;
+  }
+
+  const majorName = effectiveMajor || displayMajor;
   const trackEntry = state.bundle.rules.track_catalog?.[majorName] || null;
   const pages = Array.isArray(trackEntry?.pages) ? trackEntry.pages.filter(Boolean) : [];
   const notes = normalizeSpace(trackEntry?.notes || "");
@@ -1187,7 +2101,9 @@ function renderMajorDetail(majorName, selectedTrack, targetSemester) {
   const majorCourses = state.coursesByMajor.get(majorName) || [];
   const matched = matchCompletedCourses(majorCourses, elements.completedInput.value);
   const progression = buildProgressionContext(majorCourses, matched.matchedIds);
-  const recommendationMatch = state.activeRecommendations.find((item) => item.major === majorName);
+  const recommendationMatch =
+    state.activeRecommendations.find((item) => item.major === displayMajor) ||
+    state.activeRecommendations.find((item) => item.major === majorName);
   const recommendedTrackNames = new Set((recommendationMatch?.tracks || []).map((track) => track.name));
   const sortedTracks = allTracks.sort((a, b) => {
     const aSelected = a.name === selectedTrack ? 1 : 0;
@@ -1205,7 +2121,6 @@ function renderMajorDetail(majorName, selectedTrack, targetSemester) {
   const guideLinks = buildGuidebookLinks(pages);
   const timetableLinks = buildSemesterPdfLinks(targetSemester);
   const pdfLinks = [...guideLinks, ...timetableLinks];
-  const defaultPdfLink = guideLinks.find((link) => !link.download)?.href || timetableLinks[0]?.href || "";
   const trackSpotlight = renderTrackSpotlight({
     majorName,
     focusTrackName,
@@ -1217,7 +2132,7 @@ function renderMajorDetail(majorName, selectedTrack, targetSemester) {
     <div class="detail-header">
       <div>
         <p class="detail-kicker">선택한 전공</p>
-        <h3 class="detail-major-name">${escapeHtml(majorName)}</h3>
+        <h3 class="detail-major-name">${escapeHtml(getEffectiveMajorLabel(displayMajor, effectiveMajor))}</h3>
         <p class="detail-copy">추천된 전공의 트랙과 PDF를 같이 볼 수 있습니다.</p>
       </div>
       <div class="detail-stat-stack">
@@ -1250,12 +2165,49 @@ function renderMajorDetail(majorName, selectedTrack, targetSemester) {
   `;
 
   elements.pdfLinkStack.innerHTML = renderPdfLinks(pdfLinks);
+  clearPdfPreview();
+}
 
-  if (defaultPdfLink) {
-    elements.majorPdfFrame.src = defaultPdfLink;
-  } else {
-    elements.majorPdfFrame.removeAttribute("src");
-  }
+function renderConvergenceUnitDetail(targetSemester) {
+  const unit = getRecommendationUnit(CONVERGENCE_UNIT_NAME);
+  const submajors = getAvailableSubmajors(CONVERGENCE_UNIT_NAME);
+  const recommendationCards = submajors
+    .map((major) => {
+      const entry = state.bundle.rules.track_catalog?.[major];
+      const pages = Array.isArray(entry?.pages) ? entry.pages.filter(Boolean) : [];
+      const tracks = Array.isArray(entry?.tracks) ? entry.tracks.slice(0, 2).map((track) => track.name).join(", ") : "";
+      return `
+        <article class="track-detail-card">
+          <div class="track-detail-head">
+            <strong>${escapeHtml(stripConvergencePrefix(major))}</strong>
+            ${pages.length ? `<span class="track-flag">${escapeHtml(buildGuidebookPageLabel(pages))}</span>` : ""}
+          </div>
+          <p class="track-detail-copy">${escapeHtml(entry?.notes || unit?.summary || "세부 전공을 선택하면 트랙과 과목을 이어서 볼 수 있습니다.")}</p>
+          <div class="keyword-row">${tracks ? `<span class="keyword-pill">${escapeHtml(tracks)}</span>` : '<span class="keyword-pill">트랙 선택 후 확인</span>'}</div>
+        </article>
+      `;
+    })
+    .join("");
+  const semesterLinks = buildSemesterPdfLinks(targetSemester);
+  const guidebookLinks = [buildGuidebookDownloadLink(), ...submajors.flatMap((major) => buildGuidebookLinksForMajor(major))];
+  elements.majorDetailPanel.innerHTML = `
+    <div class="detail-header">
+      <div>
+        <p class="detail-kicker">선택한 전공</p>
+        <h3 class="detail-major-name">${escapeHtml(CONVERGENCE_UNIT_NAME)}</h3>
+        <p class="detail-copy">${escapeHtml(
+          unit?.selection_note || "융합학부는 세부 전공을 선택한 뒤 트랙과 과목 추천을 계속 확인할 수 있습니다."
+        )}</p>
+      </div>
+      <div class="detail-stat-stack">
+        <span class="detail-pill">세부 전공 ${submajors.length}</span>
+      </div>
+    </div>
+    <div class="detail-banner">세부 전공을 선택하면 트랙, PDF, 추천 과목이 해당 전공 기준으로 바뀝니다.</div>
+    <div class="track-detail-list">${recommendationCards}</div>
+  `;
+  elements.pdfLinkStack.innerHTML = renderPdfLinks([...guidebookLinks, ...semesterLinks]);
+  clearPdfPreview();
 }
 
 function renderTrackCard(track, selectedTrack, recommendedTrackNames) {
@@ -1447,17 +2399,42 @@ function renderPdfLinks(links) {
 
   return links
     .map(
-      (link) => `
-        <a
-          class="pdf-link ${link.variant || ""}"
-          href="${escapeAttr(link.href)}"
-          ${link.download ? "download" : ""}
-          target="${escapeAttr(link.target || (link.download ? "_self" : "majorPdfFrame"))}"
-          rel="noreferrer"
-        >
-          ${escapeHtml(link.label)}
-        </a>
-      `
+      (link) => {
+        if (link.download) {
+          return `
+            <a
+              class="pdf-link ${link.variant || ""}"
+              href="${escapeAttr(link.href)}"
+              download
+              target="_self"
+              rel="noreferrer"
+            >
+              ${escapeHtml(link.label)}
+            </a>
+          `;
+        }
+        if (link.target === "_blank") {
+          return `
+            <a
+              class="pdf-link ${link.variant || ""}"
+              href="${escapeAttr(link.href)}"
+              target="_blank"
+              rel="noreferrer"
+            >
+              ${escapeHtml(link.label)}
+            </a>
+          `;
+        }
+        return `
+          <button
+            type="button"
+            class="pdf-link ${link.variant || ""}"
+            data-pdf-preview="${escapeAttr(link.href)}"
+          >
+            ${escapeHtml(link.label)}
+          </button>
+        `;
+      }
     )
     .join("");
 }
@@ -1484,6 +2461,20 @@ function buildGuidebookLinks(pages) {
   return [...links, ...pageLinks];
 }
 
+function buildGuidebookLinksForMajor(majorName) {
+  const pages = Array.isArray(state.bundle.rules.track_catalog?.[majorName]?.pages)
+    ? state.bundle.rules.track_catalog[majorName].pages.filter(Boolean)
+    : [];
+  if (!pages.length) {
+    return [];
+  }
+  return pages.slice(0, 2).map((page) => ({
+    label: `${stripConvergencePrefix(majorName)} p.${page}`,
+    href: buildPdfHref(GUIDEBOOK_PDF_PATH, page),
+    variant: "guide",
+  }));
+}
+
 function buildSemesterPdfLinks(targetSemester) {
   const files = Array.isArray(state.bundle?.coursesPayload?.files) ? state.bundle.coursesPayload.files : [];
   const filtered =
@@ -1497,6 +2488,12 @@ function buildSemesterPdfLinks(targetSemester) {
 }
 
 function recommendCourses(params) {
+  if (!params.major) {
+    return {
+      ...EMPTY_RESULT,
+      unmatchedCompleted: [],
+    };
+  }
   const courses = state.coursesByMajor.get(params.major) || [];
   const matched = matchCompletedCourses(courses, params.completed_courses);
   const queryText = buildCourseQueryText(params);
@@ -2202,6 +3199,13 @@ function slotTitle(key) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, Number(value || 0)));
+}
+
+function pickRandom(items) {
+  if (!Array.isArray(items) || !items.length) {
+    return null;
+  }
+  return items[Math.floor(Math.random() * items.length)] || null;
 }
 
 function buildPdfHref(path, page) {

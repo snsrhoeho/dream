@@ -43,7 +43,7 @@
             </div>
             <div class="survey-progress-card">
               <span class="survey-progress-label">응답 진행률</span>
-              <strong id="surveyProgressText">0 / 30</strong>
+              <strong id="surveyProgressText">0 / 36</strong>
               <div class="survey-progress-track">
                 <div id="surveyProgressBar" class="survey-progress-fill"></div>
               </div>
@@ -54,37 +54,9 @@
 
           <div class="form-divider"></div>
 
-          <div class="form-section">
-            <h2 class="form-title">과목 추천 연결</h2>
-          </div>
-
-          <div class="field-row planner-grid">
-            <label class="field">
-              <span>전공</span>
-              <select id="majorSelect" required></select>
-            </label>
-            <label class="field">
-              <span>트랙</span>
-              <select id="trackSelect"></select>
-            </label>
-            <label class="field">
-              <span>개설학기</span>
-              <select id="semesterSelect"></select>
-            </label>
-          </div>
-
-          <label class="field">
-            <span>이수 완료 과목</span>
-            <textarea
-              id="completedInput"
-              rows="5"
-              placeholder="과목명 또는 과목코드를 줄바꿈으로 입력"
-            ></textarea>
-          </label>
-
           <div class="action-row">
             <button id="submitButton" type="submit" class="primary-button" disabled>
-              30문항 완료 후 추천 계산
+              추천 보기
             </button>
             <button type="button" class="ghost-button" id="sampleButton">예시로 채우기</button>
             <button type="button" class="ghost-button" id="refreshButton" hidden aria-hidden="true">
@@ -104,8 +76,8 @@
 
           <section class="result-section">
             <div class="section-head">
-              <h2>선택 전공 상세</h2>
-              <p>추천 트랙, 가이드북 PDF, 시간표 원문</p>
+              <h2>선택 전공 상세 및 과목 추천 연결</h2>
+              <p>추천 트랙, 세부 전공 선택, 가이드북 PDF, 과목 추천을 이어서 확인합니다</p>
             </div>
             <div class="major-detail-grid">
               <div id="majorDetailPanel" class="panel major-detail-panel">
@@ -114,7 +86,7 @@
               <div class="panel pdf-panel">
                 <div class="pdf-panel-head">
                   <h3>PDF 바로보기</h3>
-                  <p>가이드북과 시간표를 바로 볼 수 있습니다.</p>
+                  <p>가이드북과 시간표는 필요할 때만 열거나 내려받을 수 있습니다.</p>
                 </div>
                 <div id="pdfLinkStack" class="pdf-link-stack"></div>
                 <iframe
@@ -126,6 +98,73 @@
                 ></iframe>
               </div>
             </div>
+            <div class="course-link-section">
+              <div class="panel course-link-panel">
+              <div class="section-head">
+                <div>
+                  <h2>과목 추천 연결</h2>
+                  <p>선택 전공과 이수 과목 기준으로 다음 학기 추천을 다시 계산합니다.</p>
+                </div>
+              </div>
+
+              <div class="field-row planner-grid">
+                <label class="field">
+                  <span>전공</span>
+                  <select id="majorSelect" form="plannerForm" required></select>
+                </label>
+                <label id="submajorField" class="field" hidden>
+                  <span>세부 전공</span>
+                  <select id="submajorSelect" form="plannerForm"></select>
+                </label>
+                <label class="field">
+                  <span>트랙</span>
+                  <select id="trackSelect" form="plannerForm"></select>
+                </label>
+                <label class="field">
+                  <span>개설학기</span>
+                  <select id="semesterSelect" form="plannerForm"></select>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>이수 완료 과목</span>
+                <textarea
+                  id="completedInput"
+                  form="plannerForm"
+                  rows="5"
+                  placeholder="과목명 또는 과목코드를 줄바꿈으로 입력"
+                ></textarea>
+              </label>
+
+              <div class="action-row">
+                <button
+                  id="courseSubmitButton"
+                  type="submit"
+                  form="plannerForm"
+                  class="primary-button"
+                  disabled
+                >
+                  이 전공으로 과목 추천 보기
+                </button>
+              </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="result-section">
+            <div class="section-head">
+              <h2>추천 과목</h2>
+              <p>이번 학기에 들을 만한 과목입니다</p>
+            </div>
+            <div id="readyResults" class="card-grid"></div>
+          </section>
+
+          <section class="result-section">
+            <div class="section-head">
+              <h2>보류 과목</h2>
+              <p>선수과목이 부족한 과목입니다</p>
+            </div>
+            <div id="blockedResults" class="card-grid blocked-grid"></div>
           </section>
 
           <div class="summary-grid">
@@ -147,22 +186,6 @@
           </div>
 
           <div id="messageBox" class="panel message-box">질문에 답하면 추천 결과가 나옵니다.</div>
-
-          <section class="result-section">
-            <div class="section-head">
-              <h2>추천 과목</h2>
-              <p>이번 학기에 들을 만한 과목입니다</p>
-            </div>
-            <div id="readyResults" class="card-grid"></div>
-          </section>
-
-          <section class="result-section">
-            <div class="section-head">
-              <h2>보류 과목</h2>
-              <p>선수과목이 부족한 과목입니다</p>
-            </div>
-            <div id="blockedResults" class="card-grid blocked-grid"></div>
-          </section>
         </section>
       </section>
     </main>

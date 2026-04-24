@@ -499,7 +499,7 @@ body::before {
 }
 
 .planner-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 }
 
 .field-row {
@@ -511,6 +511,10 @@ body::before {
   display: grid;
   gap: 8px;
   margin-bottom: 14px;
+}
+
+.field[hidden] {
+  display: none !important;
 }
 
 .field span {
@@ -535,6 +539,29 @@ textarea {
   padding: 14px 15px;
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, background 160ms ease;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+#majorSelect {
+  background: var(--major-select-bg, rgba(255, 255, 255, 0.98));
+  border-color: var(--major-select-border, rgba(22, 49, 58, 0.1));
+  color: var(--major-select-text, var(--ink));
+  font-weight: 700;
+}
+
+#majorSelect optgroup {
+  color: #48637c;
+  font-style: normal;
+  font-weight: 700;
+}
+
+#majorSelect:hover {
+  border-color: var(--major-select-border, rgba(22, 49, 58, 0.1));
+}
+
+#majorSelect:focus {
+  background: var(--major-select-bg, rgba(255, 255, 255, 0.98));
+  border-color: var(--major-select-border, rgba(22, 49, 58, 0.1));
+  box-shadow: 0 0 0 5px rgba(122, 167, 219, 0.12);
 }
 
 select:hover,
@@ -600,6 +627,21 @@ textarea {
 
 .results {
   min-width: 0;
+}
+
+.course-link-panel {
+  padding: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(166, 223, 255, 0.18), transparent 30%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.96), rgba(240, 248, 255, 0.92));
+}
+
+.course-link-section {
+  margin-top: 16px;
+}
+
+.course-link-panel .section-head {
+  margin-bottom: 16px;
 }
 
 .summary-grid {
@@ -704,9 +746,9 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 60px;
+  min-width: 78px;
   height: 34px;
-  padding: 0 10px;
+  padding: 0 12px;
   border-radius: 999px;
   background: rgba(22, 49, 58, 0.06);
   color: var(--ink);
@@ -1144,6 +1186,11 @@ textarea {
   transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
+button.pdf-link {
+  font-family: inherit;
+  cursor: pointer;
+}
+
 .pdf-link:hover,
 .source-link:hover {
   transform: translateY(-1px);
@@ -1239,6 +1286,7 @@ textarea {
 
   .hero,
   .form-panel,
+  .course-link-panel,
   .major-card,
   .result-card,
   .survey-section,

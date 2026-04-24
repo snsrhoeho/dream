@@ -1,0 +1,669 @@
+{
+  "version": "2026-04-23-major-balanced-v1",
+  "title": "학과별 균등 36문항 설문안",
+  "description": "18개 추천 단위에 대해 각 2문항씩 배정한 6지선다 설문 초안입니다. 융합학부는 추천 단계에서는 단일 학과로 취급하고, 선택 전공 단계에서만 세부 전공을 노출합니다.",
+  "scale_options": [
+    { "score": 1, "label": "전혀 아니다", "normalized": 0.0 },
+    { "score": 2, "label": "아니다", "normalized": 0.2 },
+    { "score": 3, "label": "조금 아니다", "normalized": 0.4 },
+    { "score": 4, "label": "조금 그렇다", "normalized": 0.6 },
+    { "score": 5, "label": "그렇다", "normalized": 0.8 },
+    { "score": 6, "label": "매우 그렇다", "normalized": 1.0 }
+  ],
+  "recommendation_units": [
+    {
+      "id": "theology",
+      "name": "신학과",
+      "college": "신학대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["신학과"],
+      "keywords": ["신학", "성서", "기독교세계관", "교회사역"],
+      "summary": "성서와 기독교 세계관, 교회와 사회를 해석하는 신학 중심 전공입니다."
+    },
+    {
+      "id": "christian_education_counseling",
+      "name": "기독교교육상담학과",
+      "college": "신학대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["기독교교육상담학과"],
+      "keywords": ["상담", "교육", "청소년", "공동체지원"],
+      "summary": "상담과 교육 실천을 통해 개인과 공동체의 성장을 돕는 전공입니다."
+    },
+    {
+      "id": "cultural_mission",
+      "name": "문화선교학과",
+      "college": "신학대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["문화선교학과"],
+      "keywords": ["문화", "선교", "미디어", "지역문화기획"],
+      "summary": "문화·미디어·공동체 사역을 연결하는 실천형 전공입니다."
+    },
+    {
+      "id": "korean_language_literature",
+      "name": "국어국문학과",
+      "college": "인문대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["국어국문학과"],
+      "keywords": ["국어", "문학", "글쓰기", "해석"],
+      "summary": "한국어 표현과 문학 해석, 글쓰기 역량을 깊게 다루는 전공입니다."
+    },
+    {
+      "id": "english_language_literature",
+      "name": "영어영문학과",
+      "college": "인문대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["영어영문학과"],
+      "keywords": ["영어", "번역", "영문학", "해외문화"],
+      "summary": "영어 독해·번역과 해외 문화 이해를 기반으로 하는 전공입니다."
+    },
+    {
+      "id": "chinese_language_literature",
+      "name": "중어중문학과",
+      "college": "인문대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["중어중문학과"],
+      "keywords": ["중국어", "중국문화", "동아시아", "교류"],
+      "summary": "중국어와 중국 문화·사회 이해를 중심으로 하는 전공입니다."
+    },
+    {
+      "id": "tourism",
+      "name": "관광학과",
+      "college": "사회과학대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["관광학과"],
+      "keywords": ["관광", "여행", "서비스", "현장운영"],
+      "summary": "관광 자원과 서비스 경험을 설계하고 운영하는 전공입니다."
+    },
+    {
+      "id": "international_development_cooperation",
+      "name": "국제개발협력학과",
+      "college": "사회과학대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["국제개발협력학과"],
+      "keywords": ["국제개발", "ODA", "국제협력", "프로젝트"],
+      "summary": "국제 이슈와 개발협력 프로젝트를 다루는 전공입니다."
+    },
+    {
+      "id": "social_welfare",
+      "name": "사회복지학과",
+      "college": "사회과학대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["사회복지학과"],
+      "keywords": ["사회복지", "상담", "사례관리", "지역사회"],
+      "summary": "복지 제도와 실천 현장을 통해 사람을 지원하는 전공입니다."
+    },
+    {
+      "id": "public_administration",
+      "name": "행정학부",
+      "college": "사회과학대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["행정학부"],
+      "keywords": ["행정", "정책", "조직운영", "공공"],
+      "summary": "정책·행정·공공 조직 운영을 중심으로 사회 문제를 다루는 전공입니다."
+    },
+    {
+      "id": "business_administration",
+      "name": "경영학과",
+      "college": "글로벌경영기술대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["경영학과"],
+      "keywords": ["경영", "마케팅", "재무", "사업전략"],
+      "summary": "시장과 조직을 읽고 사업 전략을 설계하는 전공입니다."
+    },
+    {
+      "id": "global_logistics",
+      "name": "글로벌물류학과",
+      "college": "글로벌경영기술대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["글로벌물류학과", "글로벌물류학부"],
+      "keywords": ["물류", "유통", "무역", "공급망"],
+      "summary": "국제 유통·무역·공급망 흐름을 다루는 전공입니다."
+    },
+    {
+      "id": "industrial_management_engineering",
+      "name": "산업경영공학과",
+      "college": "글로벌경영기술대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["산업경영공학과"],
+      "keywords": ["최적화", "공정", "품질", "데이터분석"],
+      "summary": "생산과 공정을 데이터 기반으로 최적화하는 전공입니다."
+    },
+    {
+      "id": "computer_science",
+      "name": "컴퓨터공학과",
+      "college": "IT공과대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["컴퓨터공학과"],
+      "keywords": ["프로그래밍", "알고리즘", "소프트웨어", "시스템"],
+      "summary": "프로그래밍과 시스템 설계를 기반으로 핵심 기술을 만드는 전공입니다."
+    },
+    {
+      "id": "information_communication_engineering",
+      "name": "정보통신공학과",
+      "college": "IT공과대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["정보통신공학과", "정보통신학과"],
+      "keywords": ["정보통신", "네트워크", "IoT", "연결"],
+      "summary": "통신·네트워크·IoT 시스템을 설계하는 전공입니다."
+    },
+    {
+      "id": "media_software",
+      "name": "미디어소프트웨어학과",
+      "college": "IT공과대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["미디어소프트웨어학과"],
+      "keywords": ["앱개발", "웹서비스", "UX", "콘텐츠개발"],
+      "summary": "사용자 경험과 콘텐츠 서비스를 구현하는 소프트웨어 전공입니다."
+    },
+    {
+      "id": "urban_design_information_engineering",
+      "name": "도시디자인정보공학과",
+      "college": "IT공과대학",
+      "question_count": 2,
+      "selection_mode": "major",
+      "source_majors": ["도시디자인정보공학과"],
+      "keywords": ["도시", "공간정보", "GIS", "스마트시티"],
+      "summary": "도시·공간 설계와 정보기술을 결합하는 전공입니다."
+    },
+    {
+      "id": "convergence_college",
+      "name": "융합학부",
+      "college": "미래인재융합대학",
+      "question_count": 2,
+      "selection_mode": "submajor",
+      "source_majors": [
+        "융합학부 미디어콘텐츠테크놀로지전공",
+        "융합학부 바이오화장품공학전공",
+        "융합학부 K-콘텐츠전공"
+      ],
+      "keywords": ["융합", "프로젝트", "실습", "산업연계", "기획", "콘텐츠", "제품"],
+      "summary": "기술·콘텐츠·산업을 융합해 실무형 결과물을 만드는 전공 단위입니다.",
+      "selection_note": "추천 단계에서는 융합학부만 노출하고, 선택 전공 이후에만 세부 전공을 고르게 합니다."
+    }
+  ],
+  "sections": [
+    {
+      "id": "theology_college",
+      "title": "신학대학",
+      "copy": "신학, 교육·상담, 문화선교 성향을 확인하는 문항입니다.",
+      "questions": [
+        {
+          "id": "q01",
+          "primary_major": "신학과",
+          "secondary_majors": ["기독교교육상담학과", "문화선교학과"],
+          "dimension": "worldview",
+          "prompt": "성서와 기독교 세계관을 바탕으로 인간과 사회를 해석하는 공부가 흥미롭다.",
+          "major_weights": {
+            "신학과": 1.0,
+            "기독교교육상담학과": 0.25,
+            "문화선교학과": 0.2
+          }
+        },
+        {
+          "id": "q02",
+          "primary_major": "신학과",
+          "secondary_majors": ["문화선교학과"],
+          "dimension": "theological_discussion",
+          "prompt": "교회와 사회의 문제를 신학적 관점으로 깊이 읽고 토론하는 편이 잘 맞는다.",
+          "major_weights": {
+            "신학과": 1.0,
+            "문화선교학과": 0.2
+          }
+        },
+        {
+          "id": "q03",
+          "primary_major": "기독교교육상담학과",
+          "secondary_majors": ["사회복지학과", "신학과"],
+          "dimension": "care_support",
+          "prompt": "사람의 성장과 심리를 이해하고 상담이나 교육으로 돕는 역할에 끌린다.",
+          "major_weights": {
+            "기독교교육상담학과": 1.0,
+            "사회복지학과": 0.3,
+            "신학과": 0.2
+          }
+        },
+        {
+          "id": "q04",
+          "primary_major": "기독교교육상담학과",
+          "secondary_majors": ["사회복지학과"],
+          "dimension": "program_design",
+          "prompt": "청소년·가정·공동체를 위한 교육 프로그램을 직접 설계해 보고 싶다.",
+          "major_weights": {
+            "기독교교육상담학과": 1.0,
+            "사회복지학과": 0.25
+          }
+        },
+        {
+          "id": "q05",
+          "primary_major": "문화선교학과",
+          "secondary_majors": ["융합학부", "신학과"],
+          "dimension": "culture_message",
+          "prompt": "문화·미디어·공연·콘텐츠를 통해 가치와 메시지를 전달하는 일이 흥미롭다.",
+          "major_weights": {
+            "문화선교학과": 1.0,
+            "융합학부": 0.3,
+            "신학과": 0.2
+          }
+        },
+        {
+          "id": "q06",
+          "primary_major": "문화선교학과",
+          "secondary_majors": ["국제개발협력학과", "신학과"],
+          "dimension": "global_mission",
+          "prompt": "국내외 문화 이해와 공동체 사역을 연결하는 활동에 관심이 있다.",
+          "major_weights": {
+            "문화선교학과": 1.0,
+            "국제개발협력학과": 0.3,
+            "신학과": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "humanities_college",
+      "title": "인문대학",
+      "copy": "언어, 문학, 해석과 문화 이해 성향을 확인하는 문항입니다.",
+      "questions": [
+        {
+          "id": "q07",
+          "primary_major": "국어국문학과",
+          "secondary_majors": ["융합학부", "영어영문학과"],
+          "dimension": "writing_literature",
+          "prompt": "한국어의 표현, 글쓰기, 문학 작품 해석을 깊게 다루고 싶다.",
+          "major_weights": {
+            "국어국문학과": 1.0,
+            "융합학부": 0.2,
+            "영어영문학과": 0.15
+          }
+        },
+        {
+          "id": "q08",
+          "primary_major": "국어국문학과",
+          "secondary_majors": ["융합학부"],
+          "dimension": "editing_story",
+          "prompt": "글을 쓰거나 문장을 다듬고 스토리 구조를 분석하는 작업이 잘 맞는다.",
+          "major_weights": {
+            "국어국문학과": 1.0,
+            "융합학부": 0.25
+          }
+        },
+        {
+          "id": "q09",
+          "primary_major": "영어영문학과",
+          "secondary_majors": ["국제개발협력학과", "글로벌물류학과"],
+          "dimension": "english_reading_translation",
+          "prompt": "영어 원문을 읽고 번역하거나 문화 맥락까지 이해하는 과정이 즐겁다.",
+          "major_weights": {
+            "영어영문학과": 1.0,
+            "국제개발협력학과": 0.25,
+            "글로벌물류학과": 0.15
+          }
+        },
+        {
+          "id": "q10",
+          "primary_major": "영어영문학과",
+          "secondary_majors": ["국제개발협력학과", "융합학부"],
+          "dimension": "global_communication",
+          "prompt": "영어로 소통하고 해외 문화·문학·콘텐츠를 연결해 보는 일에 흥미가 있다.",
+          "major_weights": {
+            "영어영문학과": 1.0,
+            "국제개발협력학과": 0.25,
+            "융합학부": 0.2
+          }
+        },
+        {
+          "id": "q11",
+          "primary_major": "중어중문학과",
+          "secondary_majors": ["글로벌물류학과", "국제개발협력학과"],
+          "dimension": "china_language_culture",
+          "prompt": "중국어와 중국 문화·사회·콘텐츠를 함께 배우는 것이 매력적이다.",
+          "major_weights": {
+            "중어중문학과": 1.0,
+            "글로벌물류학과": 0.25,
+            "국제개발협력학과": 0.2
+          }
+        },
+        {
+          "id": "q12",
+          "primary_major": "중어중문학과",
+          "secondary_majors": ["글로벌물류학과", "관광학과"],
+          "dimension": "east_asia_exchange",
+          "prompt": "동아시아권 언어 능력을 기반으로 비즈니스나 교류 활동을 하고 싶다.",
+          "major_weights": {
+            "중어중문학과": 1.0,
+            "글로벌물류학과": 0.3,
+            "관광학과": 0.15
+          }
+        }
+      ]
+    },
+    {
+      "id": "social_science_college",
+      "title": "사회과학대학",
+      "copy": "현장 서비스, 공공 정책, 개발협력, 복지 실천 성향을 확인하는 문항입니다.",
+      "questions": [
+        {
+          "id": "q13",
+          "primary_major": "관광학과",
+          "secondary_majors": ["경영학과"],
+          "dimension": "tourism_service",
+          "prompt": "여행·호텔·서비스·지역 자원을 연결해 고객 경험을 설계하는 일이 재미있다.",
+          "major_weights": {
+            "관광학과": 1.0,
+            "경영학과": 0.25
+          }
+        },
+        {
+          "id": "q14",
+          "primary_major": "관광학과",
+          "secondary_majors": ["행정학부", "글로벌물류학과"],
+          "dimension": "field_operation",
+          "prompt": "사람을 직접 만나 안내하고 현장 운영을 조율하는 서비스 업무가 잘 맞는다.",
+          "major_weights": {
+            "관광학과": 1.0,
+            "행정학부": 0.2,
+            "글로벌물류학과": 0.15
+          }
+        },
+        {
+          "id": "q15",
+          "primary_major": "국제개발협력학과",
+          "secondary_majors": ["행정학부", "사회복지학과"],
+          "dimension": "global_issue",
+          "prompt": "국제 이슈, ODA, 개발협력, 인권 문제를 다루는 일에 관심이 많다.",
+          "major_weights": {
+            "국제개발협력학과": 1.0,
+            "행정학부": 0.25,
+            "사회복지학과": 0.2
+          }
+        },
+        {
+          "id": "q16",
+          "primary_major": "국제개발협력학과",
+          "secondary_majors": ["행정학부", "글로벌물류학과"],
+          "dimension": "international_project",
+          "prompt": "해외 공동체와 협력하며 정책·사업·프로젝트를 설계하는 역할에 끌린다.",
+          "major_weights": {
+            "국제개발협력학과": 1.0,
+            "행정학부": 0.25,
+            "글로벌물류학과": 0.2
+          }
+        },
+        {
+          "id": "q17",
+          "primary_major": "사회복지학과",
+          "secondary_majors": ["기독교교육상담학과", "행정학부"],
+          "dimension": "welfare_support",
+          "prompt": "도움이 필요한 사람을 장기적으로 지원하는 제도와 실천 현장에 관심이 있다.",
+          "major_weights": {
+            "사회복지학과": 1.0,
+            "기독교교육상담학과": 0.25,
+            "행정학부": 0.2
+          }
+        },
+        {
+          "id": "q18",
+          "primary_major": "사회복지학과",
+          "secondary_majors": ["기독교교육상담학과"],
+          "dimension": "case_management",
+          "prompt": "복지 서비스 상담, 사례관리, 지역사회 지원 같은 실무가 잘 맞는다.",
+          "major_weights": {
+            "사회복지학과": 1.0,
+            "기독교교육상담학과": 0.3
+          }
+        },
+        {
+          "id": "q19",
+          "primary_major": "행정학부",
+          "secondary_majors": ["국제개발협력학과", "사회복지학과"],
+          "dimension": "policy_design",
+          "prompt": "공공정책, 행정, 제도 설계를 통해 사회 문제를 해결하는 방식에 관심이 있다.",
+          "major_weights": {
+            "행정학부": 1.0,
+            "국제개발협력학과": 0.25,
+            "사회복지학과": 0.2
+          }
+        },
+        {
+          "id": "q20",
+          "primary_major": "행정학부",
+          "secondary_majors": ["경영학과", "국제개발협력학과"],
+          "dimension": "organization_management",
+          "prompt": "여러 이해관계자를 조정하며 조직·예산·정책을 운영하는 일이 잘 맞는다.",
+          "major_weights": {
+            "행정학부": 1.0,
+            "경영학과": 0.25,
+            "국제개발협력학과": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "business_technology_college",
+      "title": "글로벌경영기술대학",
+      "copy": "시장, 공급망, 공정과 데이터 최적화 성향을 확인하는 문항입니다.",
+      "questions": [
+        {
+          "id": "q21",
+          "primary_major": "경영학과",
+          "secondary_majors": ["글로벌물류학과", "산업경영공학과"],
+          "dimension": "market_strategy",
+          "prompt": "시장 반응을 보고 상품·브랜드·조직 전략을 세우는 일이 흥미롭다.",
+          "major_weights": {
+            "경영학과": 1.0,
+            "글로벌물류학과": 0.2,
+            "산업경영공학과": 0.15
+          }
+        },
+        {
+          "id": "q22",
+          "primary_major": "경영학과",
+          "secondary_majors": ["글로벌물류학과"],
+          "dimension": "business_operations",
+          "prompt": "마케팅·재무·회계·창업처럼 사업 운영 전반을 배우고 싶다.",
+          "major_weights": {
+            "경영학과": 1.0,
+            "글로벌물류학과": 0.2
+          }
+        },
+        {
+          "id": "q23",
+          "primary_major": "글로벌물류학과",
+          "secondary_majors": ["경영학과", "산업경영공학과"],
+          "dimension": "supply_chain",
+          "prompt": "유통·무역·운송 흐름을 분석하고 공급망을 효율화하는 일이 흥미롭다.",
+          "major_weights": {
+            "글로벌물류학과": 1.0,
+            "경영학과": 0.2,
+            "산업경영공학과": 0.2
+          }
+        },
+        {
+          "id": "q24",
+          "primary_major": "글로벌물류학과",
+          "secondary_majors": ["국제개발협력학과", "중어중문학과"],
+          "dimension": "global_distribution",
+          "prompt": "국제 거래, 물류 데이터, 해외 시장 흐름을 함께 보는 전공이 잘 맞는다.",
+          "major_weights": {
+            "글로벌물류학과": 1.0,
+            "국제개발협력학과": 0.2,
+            "중어중문학과": 0.15
+          }
+        },
+        {
+          "id": "q25",
+          "primary_major": "산업경영공학과",
+          "secondary_majors": ["컴퓨터공학과", "글로벌물류학과"],
+          "dimension": "process_optimization",
+          "prompt": "생산·공정·데이터를 분석해서 시스템을 최적화하는 문제가 재미있다.",
+          "major_weights": {
+            "산업경영공학과": 1.0,
+            "컴퓨터공학과": 0.2,
+            "글로벌물류학과": 0.2
+          }
+        },
+        {
+          "id": "q26",
+          "primary_major": "산업경영공학과",
+          "secondary_majors": ["경영학과", "컴퓨터공학과"],
+          "dimension": "quality_improvement",
+          "prompt": "숫자와 프로세스를 기반으로 효율 개선이나 품질 향상을 설계하고 싶다.",
+          "major_weights": {
+            "산업경영공학과": 1.0,
+            "경영학과": 0.2,
+            "컴퓨터공학과": 0.15
+          }
+        }
+      ]
+    },
+    {
+      "id": "it_engineering_college",
+      "title": "IT공과대학",
+      "copy": "코드, 연결, 사용자 경험, 공간 데이터 성향을 확인하는 문항입니다.",
+      "questions": [
+        {
+          "id": "q27",
+          "primary_major": "컴퓨터공학과",
+          "secondary_majors": ["미디어소프트웨어학과", "정보통신공학과"],
+          "dimension": "programming_core",
+          "prompt": "프로그래밍으로 문제를 해결하고 알고리즘이나 소프트웨어 구조를 다루는 일이 즐겁다.",
+          "major_weights": {
+            "컴퓨터공학과": 1.0,
+            "미디어소프트웨어학과": 0.25,
+            "정보통신공학과": 0.2
+          }
+        },
+        {
+          "id": "q28",
+          "primary_major": "컴퓨터공학과",
+          "secondary_majors": ["정보통신공학과", "산업경영공학과"],
+          "dimension": "system_logic",
+          "prompt": "AI·시스템·데이터 처리처럼 기술의 핵심 로직을 만드는 쪽에 더 끌린다.",
+          "major_weights": {
+            "컴퓨터공학과": 1.0,
+            "정보통신공학과": 0.2,
+            "산업경영공학과": 0.15
+          }
+        },
+        {
+          "id": "q29",
+          "primary_major": "정보통신공학과",
+          "secondary_majors": ["컴퓨터공학과", "도시디자인정보공학과"],
+          "dimension": "network_iot",
+          "prompt": "네트워크, 통신, IoT, 하드웨어와 소프트웨어 연결 구조에 관심이 있다.",
+          "major_weights": {
+            "정보통신공학과": 1.0,
+            "컴퓨터공학과": 0.2,
+            "도시디자인정보공학과": 0.15
+          }
+        },
+        {
+          "id": "q30",
+          "primary_major": "정보통신공학과",
+          "secondary_majors": ["컴퓨터공학과"],
+          "dimension": "system_connectivity",
+          "prompt": "기기와 기기, 사람과 시스템이 안정적으로 연결되도록 설계하는 일이 흥미롭다.",
+          "major_weights": {
+            "정보통신공학과": 1.0,
+            "컴퓨터공학과": 0.2
+          }
+        },
+        {
+          "id": "q31",
+          "primary_major": "미디어소프트웨어학과",
+          "secondary_majors": ["컴퓨터공학과", "융합학부"],
+          "dimension": "user_facing_software",
+          "prompt": "앱·웹·콘텐츠 서비스처럼 사용자가 직접 쓰는 소프트웨어를 만드는 일이 재미있다.",
+          "major_weights": {
+            "미디어소프트웨어학과": 1.0,
+            "컴퓨터공학과": 0.2,
+            "융합학부": 0.2
+          }
+        },
+        {
+          "id": "q32",
+          "primary_major": "미디어소프트웨어학과",
+          "secondary_majors": ["융합학부", "도시디자인정보공학과"],
+          "dimension": "ux_interaction",
+          "prompt": "UX, 인터랙션, 콘텐츠와 개발을 함께 보는 프로젝트형 작업이 잘 맞는다.",
+          "major_weights": {
+            "미디어소프트웨어학과": 1.0,
+            "융합학부": 0.25,
+            "도시디자인정보공학과": 0.15
+          }
+        },
+        {
+          "id": "q33",
+          "primary_major": "도시디자인정보공학과",
+          "secondary_majors": ["정보통신공학과", "산업경영공학과"],
+          "dimension": "spatial_data",
+          "prompt": "도시·공간·교통·지도 데이터처럼 현실 공간 정보를 디지털로 다루는 분야에 관심이 있다.",
+          "major_weights": {
+            "도시디자인정보공학과": 1.0,
+            "정보통신공학과": 0.2,
+            "산업경영공학과": 0.15
+          }
+        },
+        {
+          "id": "q34",
+          "primary_major": "도시디자인정보공학과",
+          "secondary_majors": ["행정학부", "정보통신공학과"],
+          "dimension": "smart_city",
+          "prompt": "공간 설계와 정보기술을 결합해 스마트시티 문제를 해결하는 일이 흥미롭다.",
+          "major_weights": {
+            "도시디자인정보공학과": 1.0,
+            "행정학부": 0.15,
+            "정보통신공학과": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "convergence_college",
+      "title": "미래인재융합대학",
+      "copy": "융합학부는 추천 단계에서 단일 학과로 취급합니다.",
+      "questions": [
+        {
+          "id": "q35",
+          "primary_major": "융합학부",
+          "secondary_majors": ["미디어소프트웨어학과", "경영학과"],
+          "dimension": "convergence_projects",
+          "prompt": "하나의 전통 학문보다 기술·콘텐츠·산업을 섞어 새로운 제품이나 서비스를 만드는 전공이 더 잘 맞는다.",
+          "major_weights": {
+            "융합학부": 1.0,
+            "미디어소프트웨어학과": 0.2,
+            "경영학과": 0.15
+          }
+        },
+        {
+          "id": "q36",
+          "primary_major": "융합학부",
+          "secondary_majors": ["문화선교학과", "산업경영공학과"],
+          "dimension": "hands_on_fusion",
+          "prompt": "이론만 배우기보다 프로젝트, 제작, 실습, 산업 응용을 통해 결과물을 만드는 융합형 전공에 끌린다.",
+          "major_weights": {
+            "융합학부": 1.0,
+            "문화선교학과": 0.15,
+            "산업경영공학과": 0.15
+          }
+        }
+      ]
+    }
+  ]
+}
